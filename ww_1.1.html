@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<!--
+chance log:
+1.1 : exitcodes van detailresult aangepast
+
+1.0 : eerste versie
+//-->
+
+<html>
+  <head>
+    <title>CCV en FrontStore exitcodes</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="Matthijs van der Heide">
+	<meta name="copyright" content="Centric Retail Solutions 2017">
+	<meta name="description" content="genereer het ccv wachtwoord en de verschillende exitcodes voor frontstore">
+    <script type="text/javascript">
+      // vult de datum en tijd tekstvakken en start de functie om de ww te berekene
+	  function init(){
+	    //genereer de huidige tijd en datum variablen
+        var huidigeDatum=new Date();
+        var maand=huidigeDatum.getMonth()+1;
+        var dag=huidigeDatum.getDate();
+        var uur=huidigeDatum.getHours();
+   
+        // datum in input element invullen
+        document.getElementById('datum').value=huidigeDatum.getFullYear()+'-'+addTrailingZero(maand)+'-'+addTrailingZero(dag);
+  
+        // tijd in input element invullen
+        document.getElementById('tijd').value=addTrailingZero(uur)+':'+addTrailingZero(huidigeDatum.getMinutes())+':'+addTrailingZero(huidigeDatum.getSeconds());
+      
+        // ww berekenen
+		berekenWW();
+      };
+
+
+	  //lees de tekst vakken uit en bereken de ww en toon dit in de labels
+	  function berekenWW(){
+	    //lees de tekst vakken van datum en tijd uit
+	    ingevoerdeDatum=document.getElementById('datum').value;
+		ingevoerdeTijd=document.getElementById('tijd').value;
+		
+		//verwijder de voorloop nul en converteer naar nummer
+		maand=Number(delTrailingZero(ingevoerdeDatum.slice(5,7)));
+	    dag=Number(delTrailingZero(ingevoerdeDatum.slice(8,10)));
+		uur=Number(delTrailingZero(ingevoerdeTijd.slice(0,2)));
+	  
+        // bereken de ww	  
+	    var frontStore= 'not available'; //due to copyright
+        var ccv2=(dag+uur+2)%10;
+        var ccv1=(dag+uur+2-ccv2)/10;
+        var ccv=1000*((ccv2+9)%10)+100*ccv2+ccv1*10+ccv1+1;
+		var detailResultCentric='not available'; //due to copyright
+        var detailResultTweede='not available'; //due to copyright
+
+      
+	    //voeg eventueel een trailing 0 als dit in een berekening uitkomt
+        if (dag<5){
+          detailResultCentric='0'+detailResultCentric;
+          detailResultTweede='0'+detailResultTweede;
+          frontStore='0'+frontStore;
+        }
+          if (ccv2==1){
+          ccv= '0'+ccv;
+        }
+	  
+	    // ww invullen
+		//document.getElementById('ccv').value=ccv;
+	    document.getElementById('ccv').innerHTML=ccv;
+        document.getElementById('frontStore').innerHTML=frontStore;
+		document.getElementById('detailResultCentric').innerHTML=detailResultCentric;
+        document.getElementById('detailResultTweede').innerHTML=detailResultTweede;
+	  }
+	  
+	  
+	  // functie voor toevoegen voorloop nul 
+	  function addTrailingZero(val){
+        if(val<10){
+         val='0'+val;
+        }
+        return val;
+      }
+
+	  
+	  // functie voor verwijderen voorloop nul 
+	  function delTrailingZero(val){
+        if(val.charAt(0)== '0'){
+         val=val.slice(1);
+        }
+        return val;
+      }
+
+      window.onload=init;
+    </script>
+    <style>
+      .rechterKolom {
+        display: inline-block;
+        font-weight: bold;
+        width:150px;
+      }
+      
+      .linkerKolom {
+        display: inline-block;
+        width:100px;
+      }
+      
+      .legeRegel {
+        width:100%;
+        height:1em;
+      }
+      
+      
+      #rechtsUitgelijndeButton {
+        margin-left: 105px;
+      }
+	  
+	  #tijdInput {
+	    width: 200px;
+	  }
+    </style>
+  </head>
+  <body>
+    <div class="linkerKolom">
+      <div>Datum :</div>
+      <div>Tijd :</div>
+	</div>
+    <div class="rechterKolom">
+      <div><input type="date" id="datum" oninput="berekenWW()"></div>
+      <div><input type="time" id="tijd" oninput="berekenWW()"> </div>	
+	</div>
+    <div class="legeRegel"></div>
+	<div id="rechtsUitgelijndeButton">
+	  <input type="button" value="reset naar huidige tijd" onclick="init()">
+	</div>
+	<div class="legeRegel"></div>
+	<div class="linkerKolom">
+      <div>CCV :</div>
+      <div>FrontStore :</div>
+	  <div>DRS (centric) :</div>
+      <div>DRS (tweede) :</div>
+    </div>
+    <div class="rechterKolom">
+      <div id="ccv"></div>
+      <div id="frontStore"></div>
+      <div id="detailResultCentric"></div>
+	  <div id="detailResultTweede"></div>
+    </div>
+
+  </body>
+</html>
